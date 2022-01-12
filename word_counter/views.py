@@ -10,6 +10,11 @@ import requests
 from bs4 import BeautifulSoup
 from collections import Counter
 from string import punctuation
+import json
+
+import validators
+
+
 
 
 
@@ -22,26 +27,35 @@ def HomePageView(request):
         if form.is_valid():
             url_text = request.POST.get('your_url')
             print(url_text)
-            # We get the url
-            r = requests.get(url_text)
-            soup=BeautifulSoup(r.text,'html.parser')
+            if not validators.url(url_text):
+                print("Not valid")
+                return HttpResponse("URL no valida")
 
-            # We get the words within paragrphs
-            text_p = (''.join(s.findAll(text=True))for s in soup.findAll('p'))
-            c_p = Counter((x.rstrip(punctuation).lower() for y in text_p for x in y.split()))
-            
-            # We get the words within divs
-            text_div = (''.join(s.findAll(text=True))for s in soup.findAll('div'))
-            c_div = Counter((x.rstrip(punctuation).lower() for y in text_div for x in y.split()))
+            else: 
+                #print(validators.url(url_text))
+                # We get the url
+                r = requests.get(url_text)
+                soup=BeautifulSoup(r.text,'html.parser')
+
+                # We get the words within paragrphs
+                text_p = (''.join(s.findAll(text=True))for s in soup.findAll('p'))
+                c_p = Counter((x.rstrip(punctuation).lower() for y in text_p for x in y.split()))
+                
+                # We get the words within divs
+                text_div = (''.join(s.findAll(text=True))for s in soup.findAll('div'))
+                c_div = Counter((x.rstrip(punctuation).lower() for y in text_div for x in y.split()))
 
 
-            # We sum the two countesr and get a list with words count from most to less common
-            #total = c_div + c_p
-            total = c_p
-            list_most_common_words = total.most_common(10) 
-            print(list_most_common_words)
-            
-            return HttpResponse("10 Palabras más repetidas:{}".format(list_most_common_words))
+                # We sum the two countesr and get a list with words count from most to less common
+                #total = c_div + c_p
+                total = c_p
+                list_most_common_words = total.most_common(10) 
+                print(type(list_most_common_words))
+
+                #return HttpResponse('\n'.join(str(value) for value in list_most_common_words))
+                
+                return HttpResponse("Conteo palabras: {}".format(list_most_common_words))
+                
 
 
     # if a GET (or any other method) we'll create a blank form
