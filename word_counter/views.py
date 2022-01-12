@@ -36,12 +36,12 @@ def HomePageView(request):
 
 
             # We sum the two countesr and get a list with words count from most to less common
-            total = c_div + c_p
-            #total = c_p
+            #total = c_div + c_p
+            total = c_p
             list_most_common_words = total.most_common(10) 
             print(list_most_common_words)
             
-            return HttpResponse("Conteo palabras:{}".format(list_most_common_words))
+            return HttpResponse("10 Palabras más repetidas:{}".format(list_most_common_words))
 
 
     # if a GET (or any other method) we'll create a blank form
