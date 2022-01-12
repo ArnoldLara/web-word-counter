@@ -1,30 +1,22 @@
 import requests
 from bs4 import BeautifulSoup
+from collections import Counter
+from string import punctuation
 
-def news():
-    # the target we want to open	
-    url='https://m-monroyc22.medium.com/'
-    
-    #open with GET method
-    resp=requests.get(url)
-    
-    #http_respone 200 means OK status
-    if resp.status_code==200:
-        
-        print("Successfully opened the web page")
-        print("The news are as follow :-\n")
-        
-        # we need a parser,Python built-in HTML parser is enough .
-        soup=BeautifulSoup(resp.text,'html.parser')	
-        print(soup.get_text())
-        # l is the list which contains all the text i.e news
-        l=soup.find("ul",{"class":"searchNews"})
-        
-        #now we want to print only the text part of the anchor.
-        #find all the elements of a, i.e anchor
-        # for i in l.findAll("a"):
-        #     print(i.text)
-    else:
-        print("Error")
-        
-news()
+# We get the url
+r = requests.get("https://www.educba.com/python-curl/")
+soup=BeautifulSoup(r.text,'html.parser')	
+
+# We get the words within paragrphs
+text_p = (''.join(s.findAll(text=True))for s in soup.findAll('p'))
+c_p = Counter((x.rstrip(punctuation).lower() for y in text_p for x in y.split()))
+
+# We get the words within divs
+text_div = (''.join(s.findAll(text=True))for s in soup.findAll('div'))
+c_div = Counter((x.rstrip(punctuation).lower() for y in text_div for x in y.split()))
+
+# We sum the two countesr and get a list with words count from most to less common
+#total = c_div + c_p
+total = c_p
+list_most_common_words = total.most_common(10) 
+print(list_most_common_words)
